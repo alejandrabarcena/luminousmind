@@ -27,7 +27,7 @@ export const MeditationPlayer = ({ meditation, isOpen, onClose, onComplete }: Me
   }, [meditation]);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
 
     if (isPlaying && timeRemaining > 0) {
       interval = setInterval(() => {

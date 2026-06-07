@@ -9,7 +9,7 @@ interface HabitReminderSchedulerProps {
 
 export const HabitReminderScheduler = ({ habits, isHabitCompletedToday }: HabitReminderSchedulerProps) => {
   const { permission, scheduleHabitReminder } = useNotifications();
-  const scheduledTimeouts = useRef<Map<string, NodeJS.Timeout>>(new Map());
+  const scheduledTimeouts = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
   useEffect(() => {
     if (permission !== 'granted') return;
