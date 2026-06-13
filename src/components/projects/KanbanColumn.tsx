@@ -11,9 +11,10 @@ interface KanbanColumnProps {
   onCreateTask: (title: string, status: TaskStatus) => Promise<any>;
   onStatusChange: (taskId: string, status: TaskStatus) => void;
   onDeleteTask: (taskId: string) => void;
+  onUpdateTask: (taskId: string, updates: { title: string; description: string }) => Promise<any>;
 }
 
-export const KanbanColumn = ({ status, tasks, onCreateTask, onStatusChange, onDeleteTask }: KanbanColumnProps) => {
+export const KanbanColumn = ({ status, tasks, onCreateTask, onStatusChange, onDeleteTask, onUpdateTask }: KanbanColumnProps) => {
   const [isAdding, setIsAdding] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const statusInfo = TASK_STATUSES[status];
@@ -48,6 +49,7 @@ export const KanbanColumn = ({ status, tasks, onCreateTask, onStatusChange, onDe
             task={task} 
             onStatusChange={onStatusChange}
             onDelete={onDeleteTask}
+            onUpdate={onUpdateTask}
           />
         ))}
       </div>
