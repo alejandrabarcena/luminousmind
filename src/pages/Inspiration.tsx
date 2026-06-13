@@ -352,16 +352,97 @@ const Inspiration = () => {
               </CardContent>
             </Card>
 
+            {/* Manage challenges */}
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold font-poppins">Todos los desafíos ({challenges.length})</h3>
+              <Dialog open={addOpen} onOpenChange={setAddOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm" className="bg-gradient-creative hover:opacity-90">
+                    <Plus className="h-4 w-4 mr-2" /> Nuevo desafío
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Crear desafío</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-[80px_1fr] gap-3">
+                      <div>
+                        <Label>Icono</Label>
+                        <Input
+                          value={newChallenge.icon}
+                          onChange={(e) => setNewChallenge({ ...newChallenge, icon: e.target.value })}
+                          maxLength={2}
+                          className="text-center text-xl"
+                        />
+                      </div>
+                      <div>
+                        <Label>Título</Label>
+                        <Input
+                          value={newChallenge.title}
+                          onChange={(e) => setNewChallenge({ ...newChallenge, title: e.target.value })}
+                          placeholder="Ej: Pintar acuarela"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label>Descripción</Label>
+                      <Textarea
+                        value={newChallenge.description}
+                        onChange={(e) => setNewChallenge({ ...newChallenge, description: e.target.value })}
+                        placeholder="Qué hay que hacer..."
+                        rows={3}
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label>Dificultad</Label>
+                        <Select value={newChallenge.difficulty} onValueChange={(v) => setNewChallenge({ ...newChallenge, difficulty: v })}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="fácil">Fácil</SelectItem>
+                            <SelectItem value="medio">Medio</SelectItem>
+                            <SelectItem value="difícil">Difícil</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label>Categoría</Label>
+                        <Input
+                          value={newChallenge.category}
+                          onChange={(e) => setNewChallenge({ ...newChallenge, category: e.target.value })}
+                          placeholder="arte, escritura..."
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button variant="outline" onClick={() => setAddOpen(false)}>Cancelar</Button>
+                    <Button onClick={addChallenge}>Añadir</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
+
             {/* Challenges Grid */}
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
               {challenges.map((challenge, index) => (
-                <Card 
-                  key={index} 
-                  className={`border-0 shadow-md hover:shadow-lg transition-all cursor-pointer ${
+                <Card
+                  key={index}
+                  className={`group relative border-0 shadow-md hover:shadow-lg transition-all cursor-pointer ${
                     completedChallenges.includes(challenge.title) ? 'ring-2 ring-green-500 bg-green-50' : ''
                   }`}
                   onClick={() => setCurrentChallenge(challenge)}
                 >
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute top-1 right-1 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive"
+                    onClick={(e) => { e.stopPropagation(); removeChallenge(challenge.title); }}
+                    aria-label="Eliminar desafío"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between">
                       <span className="text-2xl">{challenge.icon}</span>
@@ -369,7 +450,7 @@ const Inspiration = () => {
                         <Check className="h-5 w-5 text-green-500" />
                       )}
                     </div>
-                    <h4 className="font-semibold mt-2 font-poppins text-foreground">{challenge.title}</h4>
+                    <h4 className="font-semibold mt-2 font-poppins text-foreground pr-6">{challenge.title}</h4>
                     <Badge className={`mt-2 text-xs ${getDifficultyColor(challenge.difficulty)}`}>
                       {challenge.difficulty}
                     </Badge>
