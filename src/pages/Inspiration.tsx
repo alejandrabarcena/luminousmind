@@ -72,6 +72,13 @@ const CHALLENGES = [
     icon: "📝"
   },
   {
+    title: "Leer libro",
+    description: "Lee un capítulo o varias páginas de un libro que alimente tu creatividad.",
+    difficulty: "fácil",
+    category: "lectura",
+    icon: "📖"
+  },
+  {
     title: "Disfrutar libros de arte",
     description: "Lee o explora durante 20 minutos un libro de arte y anota lo que te inspire.",
     difficulty: "fácil",
@@ -79,11 +86,18 @@ const CHALLENGES = [
     icon: "📚"
   },
   {
-    title: "Collage digital de técnicas mixtas",
-    description: "Crea un collage digital combinando fotos, texturas y trazos a mano.",
+    title: "Crear un collage digital",
+    description: "Combina imágenes, texturas y colores en una composición digital propia.",
     difficulty: "medio",
     category: "arte",
     icon: "🖼️"
+  },
+  {
+    title: "Técnicas de arte mixtas",
+    description: "Experimenta mezclando dibujo, pintura, recortes o texturas en una misma pieza.",
+    difficulty: "difícil",
+    category: "arte",
+    icon: "🎭"
   },
   {
     title: "Tocar un instrumento",
@@ -206,7 +220,7 @@ const Inspiration = () => {
               <Sparkles className="h-6 w-6 text-white" />
             </div>
             <span className="text-xl font-bold font-poppins bg-gradient-calm bg-clip-text text-transparent">
-              Inspiración Diaria
+              Inspiración Diaria y Desafíos
             </span>
           </div>
           <div className="w-24" />
@@ -215,7 +229,7 @@ const Inspiration = () => {
 
       {/* Main Content */}
       <main className="max-w-5xl mx-auto px-6 py-8">
-        <Tabs defaultValue="quotes" className="space-y-8">
+        <Tabs defaultValue="challenges" className="space-y-8">
           <TabsList className="grid w-full grid-cols-3 h-14">
             <TabsTrigger value="quotes" className="flex items-center gap-2 text-base">
               <Quote className="h-4 w-4" />
