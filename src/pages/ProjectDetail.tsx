@@ -87,7 +87,7 @@ const ProjectDetail = () => {
               className="w-4 h-12 rounded-full" 
               style={{ backgroundColor: project.color }}
             />
-            <div>
+            <div className="flex-1">
               <h1 className="text-3xl font-bold font-poppins text-gray-900">
                 {project.title}
               </h1>
@@ -97,12 +97,27 @@ const ProjectDetail = () => {
                 </p>
               )}
             </div>
+            <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
+              <Pencil className="h-4 w-4 mr-2" />
+              Editar
+            </Button>
           </div>
 
           {/* Kanban Board */}
           <KanbanBoard projectId={project.id} />
         </div>
       </main>
+
+      <EditProjectDialog
+        project={project}
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        onSave={async (id, updates) => {
+          const updated = await updateProject(id, updates);
+          if (updated) setProject(updated);
+          return updated;
+        }}
+      />
     </div>
   );
 };
