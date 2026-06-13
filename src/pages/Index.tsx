@@ -20,8 +20,8 @@ const Index = () => {
     },
     {
       icon: <Sparkles className="h-8 w-8" />,
-      title: "Inspiración Diaria",
-      description: "Recibe contenido motivacional y ejercicios creativos para despertar tu potencial.",
+      title: "Inspiración Diaria y Desafíos",
+      description: "Recibe contenido motivacional y actividades creativas para despertar tu potencial.",
       color: "bg-gradient-calm"
     },
     {
