@@ -49,6 +49,24 @@ export const useProjects = () => {
     return data;
   };
 
+  const updateProject = async (projectId: string, updates: Partial<Pick<Project, 'title' | 'description' | 'color'>>) => {
+    const { data, error } = await supabase
+      .from('projects')
+      .update(updates)
+      .eq('id', projectId)
+      .select()
+      .single();
+
+    if (error) {
+      toast({ title: 'Error', description: 'No se pudo actualizar el proyecto', variant: 'destructive' });
+      return null;
+    }
+
+    setProjects(projects.map(p => p.id === projectId ? data : p));
+    toast({ title: 'Proyecto actualizado' });
+    return data;
+  };
+
   const deleteProject = async (projectId: string) => {
     const { error } = await supabase
       .from('projects')
