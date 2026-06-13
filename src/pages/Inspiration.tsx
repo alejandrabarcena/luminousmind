@@ -46,7 +46,7 @@ const QUOTES = [
 ];
 
 // Creative challenges database
-const DEFAULT_CHALLENGES: Challenge[] = [
+const DEFAULT_challenges: Challenge[] = [
   { title: "Caligrafía artística", description: "Practica 10 minutos de caligrafía decorando una palabra que te inspire hoy.", difficulty: "fácil", category: "arte", icon: "🖋️" },
   { title: "Escritura creativa", description: "Escribe un micro-relato de exactamente 50 palabras sobre tu día.", difficulty: "medio", category: "escritura", icon: "✍️" },
   { title: "Aprender un idioma", description: "Dedica 15 minutos a aprender 10 palabras nuevas en otro idioma.", difficulty: "medio", category: "aprendizaje", icon: "🗣️" },
@@ -77,15 +77,15 @@ const Inspiration = () => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
   const [challenges, setChallenges] = useState<Challenge[]>(() => {
-    if (typeof window === 'undefined') return DEFAULT_CHALLENGES;
+    if (typeof window === 'undefined') return DEFAULT_challenges;
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) return JSON.parse(raw) as Challenge[];
     } catch {}
-    return DEFAULT_CHALLENGES;
+    return DEFAULT_challenges;
   });
   const [currentQuote, setCurrentQuote] = useState(QUOTES[0]);
-  const [currentChallenge, setCurrentChallenge] = useState<Challenge>(challenges[0] ?? DEFAULT_CHALLENGES[0]);
+  const [currentChallenge, setCurrentChallenge] = useState<Challenge>(challenges[0] ?? DEFAULT_challenges[0]);
   const [currentTip, setCurrentTip] = useState(WELLNESS_TIPS[0]);
   const [copied, setCopied] = useState(false);
   const [likedQuote, setLikedQuote] = useState(false);
@@ -138,7 +138,7 @@ const Inspiration = () => {
     const dayOfYear = Math.floor((today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / 86400000);
     
     setCurrentQuote(QUOTES[dayOfYear % QUOTES.length]);
-    setCurrentChallenge(CHALLENGES[dayOfYear % CHALLENGES.length]);
+    setCurrentChallenge(challenges[dayOfYear % challenges.length]);
     setCurrentTip(WELLNESS_TIPS[dayOfYear % WELLNESS_TIPS.length]);
   }, []);
 
@@ -149,8 +149,8 @@ const Inspiration = () => {
   };
 
   const refreshChallenge = () => {
-    const randomIndex = Math.floor(Math.random() * CHALLENGES.length);
-    setCurrentChallenge(CHALLENGES[randomIndex]);
+    const randomIndex = Math.floor(Math.random() * challenges.length);
+    setCurrentChallenge(challenges[randomIndex]);
   };
 
   const copyQuote = async () => {
@@ -354,7 +354,7 @@ const Inspiration = () => {
 
             {/* Challenges Grid */}
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {CHALLENGES.map((challenge, index) => (
+              {challenges.map((challenge, index) => (
                 <Card 
                   key={index} 
                   className={`border-0 shadow-md hover:shadow-lg transition-all cursor-pointer ${
