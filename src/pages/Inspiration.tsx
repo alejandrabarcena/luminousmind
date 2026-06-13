@@ -29,61 +29,75 @@ const QUOTES = [
 
 // Creative challenges database
 const CHALLENGES = [
-  { 
-    title: "Dibujo de 5 minutos", 
-    description: "Dibuja algo que veas a tu alrededor en solo 5 minutos sin levantar el lápiz.",
+  {
+    title: "Caligrafía artística",
+    description: "Practica 10 minutos de caligrafía decorando una palabra que te inspire hoy.",
     difficulty: "fácil",
     category: "arte",
-    icon: "🎨"
+    icon: "🖋️"
   },
-  { 
-    title: "Escritura creativa", 
+  {
+    title: "Escritura creativa",
     description: "Escribe un micro-relato de exactamente 50 palabras sobre tu día.",
     difficulty: "medio",
     category: "escritura",
     icon: "✍️"
   },
-  { 
-    title: "Fotografía del momento", 
-    description: "Captura una foto que represente tu estado de ánimo actual.",
-    difficulty: "fácil",
-    category: "fotografía",
-    icon: "📸"
+  {
+    title: "Aprender un idioma",
+    description: "Dedica 15 minutos a aprender 10 palabras nuevas en otro idioma.",
+    difficulty: "medio",
+    category: "aprendizaje",
+    icon: "🗣️"
   },
-  { 
-    title: "Playlist emocional", 
-    description: "Crea una playlist de 5 canciones que definan cómo te sientes hoy.",
-    difficulty: "fácil",
-    category: "música",
-    icon: "🎵"
+  {
+    title: "Programar código",
+    description: "Construye un pequeño script o componente que resuelva algo cotidiano.",
+    difficulty: "difícil",
+    category: "tecnología",
+    icon: "💻"
   },
-  { 
-    title: "Collage digital", 
-    description: "Crea un collage con 5 imágenes que representen tus metas del mes.",
+  {
+    title: "Ilustración digital",
+    description: "Crea una ilustración digital sencilla inspirada en tu estado de ánimo.",
+    difficulty: "medio",
+    category: "arte",
+    icon: "🎨"
+  },
+  {
+    title: "Actualizar blog",
+    description: "Publica una entrada corta en tu blog compartiendo una idea reciente.",
+    difficulty: "medio",
+    category: "escritura",
+    icon: "📝"
+  },
+  {
+    title: "Disfrutar libros de arte",
+    description: "Lee o explora durante 20 minutos un libro de arte y anota lo que te inspire.",
+    difficulty: "fácil",
+    category: "lectura",
+    icon: "📚"
+  },
+  {
+    title: "Collage digital de técnicas mixtas",
+    description: "Crea un collage digital combinando fotos, texturas y trazos a mano.",
     difficulty: "medio",
     category: "arte",
     icon: "🖼️"
   },
-  { 
-    title: "Carta al futuro", 
-    description: "Escribe una carta a tu yo del próximo año. ¿Qué le dirías?",
+  {
+    title: "Tocar un instrumento",
+    description: "Dedica 15 minutos a tocar un instrumento, aunque sea improvisando.",
     difficulty: "medio",
+    category: "música",
+    icon: "🎸"
+  },
+  {
+    title: "Carta de agradecimiento",
+    description: "Escribe una carta de agradecimiento a alguien que haya marcado tu vida.",
+    difficulty: "fácil",
     category: "escritura",
     icon: "💌"
-  },
-  { 
-    title: "Haiku del día", 
-    description: "Escribe un haiku (5-7-5 sílabas) inspirado en la naturaleza.",
-    difficulty: "difícil",
-    category: "escritura",
-    icon: "🌸"
-  },
-  { 
-    title: "Sketch rápido", 
-    description: "Dibuja tu comida favorita en estilo cartoon.",
-    difficulty: "fácil",
-    category: "arte",
-    icon: "🍕"
   },
 ];
 
