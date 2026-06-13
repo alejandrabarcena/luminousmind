@@ -46,91 +46,19 @@ const QUOTES = [
 ];
 
 // Creative challenges database
-const CHALLENGES = [
-  {
-    title: "Caligrafía artística",
-    description: "Practica 10 minutos de caligrafía decorando una palabra que te inspire hoy.",
-    difficulty: "fácil",
-    category: "arte",
-    icon: "🖋️"
-  },
-  {
-    title: "Escritura creativa",
-    description: "Escribe un micro-relato de exactamente 50 palabras sobre tu día.",
-    difficulty: "medio",
-    category: "escritura",
-    icon: "✍️"
-  },
-  {
-    title: "Aprender un idioma",
-    description: "Dedica 15 minutos a aprender 10 palabras nuevas en otro idioma.",
-    difficulty: "medio",
-    category: "aprendizaje",
-    icon: "🗣️"
-  },
-  {
-    title: "Programar código",
-    description: "Construye un pequeño script o componente que resuelva algo cotidiano.",
-    difficulty: "difícil",
-    category: "tecnología",
-    icon: "💻"
-  },
-  {
-    title: "Ilustración digital",
-    description: "Crea una ilustración digital sencilla inspirada en tu estado de ánimo.",
-    difficulty: "medio",
-    category: "arte",
-    icon: "🎨"
-  },
-  {
-    title: "Actualizar blog",
-    description: "Publica una entrada corta en tu blog compartiendo una idea reciente.",
-    difficulty: "medio",
-    category: "escritura",
-    icon: "📝"
-  },
-  {
-    title: "Leer libro",
-    description: "Lee un capítulo o varias páginas de un libro que alimente tu creatividad.",
-    difficulty: "fácil",
-    category: "lectura",
-    icon: "📖"
-  },
-  {
-    title: "Disfrutar libros de arte",
-    description: "Lee o explora durante 20 minutos un libro de arte y anota lo que te inspire.",
-    difficulty: "fácil",
-    category: "lectura",
-    icon: "📚"
-  },
-  {
-    title: "Crear un collage digital",
-    description: "Combina imágenes, texturas y colores en una composición digital propia.",
-    difficulty: "medio",
-    category: "arte",
-    icon: "🖼️"
-  },
-  {
-    title: "Técnicas de arte mixtas",
-    description: "Experimenta mezclando dibujo, pintura, recortes o texturas en una misma pieza.",
-    difficulty: "difícil",
-    category: "arte",
-    icon: "🎭"
-  },
-  {
-    title: "Tocar un instrumento",
-    description: "Dedica 15 minutos a tocar un instrumento, aunque sea improvisando.",
-    difficulty: "medio",
-    category: "música",
-    icon: "🎸"
-  },
-  {
-    title: "Carta de agradecimiento",
-    description: "Escribe una carta de agradecimiento a alguien que haya marcado tu vida.",
-    difficulty: "fácil",
-    category: "escritura",
-    icon: "💌"
-  },
+const DEFAULT_CHALLENGES: Challenge[] = [
+  { title: "Caligrafía artística", description: "Practica 10 minutos de caligrafía decorando una palabra que te inspire hoy.", difficulty: "fácil", category: "arte", icon: "🖋️" },
+  { title: "Escritura creativa", description: "Escribe un micro-relato de exactamente 50 palabras sobre tu día.", difficulty: "medio", category: "escritura", icon: "✍️" },
+  { title: "Aprender un idioma", description: "Dedica 15 minutos a aprender 10 palabras nuevas en otro idioma.", difficulty: "medio", category: "aprendizaje", icon: "🗣️" },
+  { title: "Programar código", description: "Construye un pequeño script o componente que resuelva algo cotidiano.", difficulty: "difícil", category: "tecnología", icon: "💻" },
+  { title: "Ilustración digital", description: "Crea una ilustración digital sencilla inspirada en tu estado de ánimo.", difficulty: "medio", category: "arte", icon: "🎨" },
+  { title: "Actualizar blog", description: "Publica una entrada corta en tu blog compartiendo una idea reciente.", difficulty: "medio", category: "escritura", icon: "📝" },
+  { title: "Leer libro", description: "Lee un capítulo o varias páginas de un libro que alimente tu creatividad.", difficulty: "fácil", category: "lectura", icon: "📖" },
+  { title: "Disfrutar libros de arte", description: "Lee o explora durante 20 minutos un libro de arte y anota lo que te inspire.", difficulty: "fácil", category: "lectura", icon: "📚" },
+  { title: "Crear un collage digital", description: "Combina imágenes, texturas y colores en una composición digital propia.", difficulty: "medio", category: "arte", icon: "🖼️" },
+  { title: "Técnicas de arte mixtas", description: "Experimenta mezclando dibujo, pintura, recortes o texturas en una misma pieza.", difficulty: "difícil", category: "arte", icon: "🎭" },
+  { title: "Tocar un instrumento", description: "Dedica 15 minutos a tocar un instrumento, aunque sea improvisando.", difficulty: "medio", category: "música", icon: "🎸" },
+  { title: "Carta de agradecimiento", description: "Escribe una carta de agradecimiento a alguien que haya marcado tu vida.", difficulty: "fácil", category: "escritura", icon: "💌" },
 ];
 
 // Daily tips
