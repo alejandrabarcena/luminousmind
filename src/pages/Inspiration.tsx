@@ -76,12 +76,55 @@ const WELLNESS_TIPS = [
 const Inspiration = () => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
+  const [challenges, setChallenges] = useState<Challenge[]>(() => {
+    if (typeof window === 'undefined') return DEFAULT_CHALLENGES;
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) return JSON.parse(raw) as Challenge[];
+    } catch {}
+    return DEFAULT_CHALLENGES;
+  });
   const [currentQuote, setCurrentQuote] = useState(QUOTES[0]);
-  const [currentChallenge, setCurrentChallenge] = useState(CHALLENGES[0]);
+  const [currentChallenge, setCurrentChallenge] = useState<Challenge>(challenges[0] ?? DEFAULT_CHALLENGES[0]);
   const [currentTip, setCurrentTip] = useState(WELLNESS_TIPS[0]);
   const [copied, setCopied] = useState(false);
   const [likedQuote, setLikedQuote] = useState(false);
   const [completedChallenges, setCompletedChallenges] = useState<string[]>([]);
+  const [addOpen, setAddOpen] = useState(false);
+  const [newChallenge, setNewChallenge] = useState<Challenge>({
+    title: '', description: '', difficulty: 'fácil', category: 'arte', icon: '✨',
+  });
+
+  useEffect(() => {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(challenges)); } catch {}
+  }, [challenges]);
+
+  const addChallenge = () => {
+    if (!newChallenge.title.trim() || !newChallenge.description.trim()) {
+      toast.error('Completa título y descripción');
+      return;
+    }
+    if (challenges.some(c => c.title === newChallenge.title.trim())) {
+      toast.error('Ya existe un desafío con ese título');
+      return;
+    }
+    const c = { ...newChallenge, title: newChallenge.title.trim(), description: newChallenge.description.trim(), icon: newChallenge.icon.trim() || '✨' };
+    setChallenges([...challenges, c]);
+    setNewChallenge({ title: '', description: '', difficulty: 'fácil', category: 'arte', icon: '✨' });
+    setAddOpen(false);
+    toast.success('Desafío añadido');
+  };
+
+  const removeChallenge = (title: string) => {
+    const next = challenges.filter(c => c.title !== title);
+    if (next.length === 0) {
+      toast.error('Debe quedar al menos un desafío');
+      return;
+    }
+    setChallenges(next);
+    if (currentChallenge.title === title) setCurrentChallenge(next[0]);
+    toast.success('Desafío eliminado');
+  };
 
   useEffect(() => {
     if (!loading && !user) {
