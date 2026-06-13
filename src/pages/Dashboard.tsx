@@ -52,8 +52,8 @@ const Dashboard = () => {
     },
     {
       icon: <Sparkles className="h-6 w-6" />,
-      title: "Inspiración Diaria",
-      description: "Contenido motivacional para ti",
+      title: "Inspiración Diaria y Desafíos",
+      description: "Actividades creativas y contenido motivacional",
       color: "bg-gradient-calm",
       available: true,
       link: "/inspiration"
