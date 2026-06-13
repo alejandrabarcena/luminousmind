@@ -4,12 +4,30 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter,
+} from '@/components/ui/dialog';
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select';
 import { 
   Lightbulb, ArrowLeft, Quote, Palette, Target, RefreshCw, 
-  Heart, Star, Sparkles, BookOpen, Zap, Share2, Copy, Check
+  Heart, Star, Sparkles, BookOpen, Zap, Share2, Copy, Check, Plus, Trash2
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
+
+type Challenge = {
+  title: string;
+  description: string;
+  difficulty: string;
+  category: string;
+  icon: string;
+};
+const STORAGE_KEY = 'lm_challenges_v1';
 
 // Motivational quotes database
 const QUOTES = [
@@ -28,91 +46,19 @@ const QUOTES = [
 ];
 
 // Creative challenges database
-const CHALLENGES = [
-  {
-    title: "Caligrafía artística",
-    description: "Practica 10 minutos de caligrafía decorando una palabra que te inspire hoy.",
-    difficulty: "fácil",
-    category: "arte",
-    icon: "🖋️"
-  },
-  {
-    title: "Escritura creativa",
-    description: "Escribe un micro-relato de exactamente 50 palabras sobre tu día.",
-    difficulty: "medio",
-    category: "escritura",
-    icon: "✍️"
-  },
-  {
-    title: "Aprender un idioma",
-    description: "Dedica 15 minutos a aprender 10 palabras nuevas en otro idioma.",
-    difficulty: "medio",
-    category: "aprendizaje",
-    icon: "🗣️"
-  },
-  {
-    title: "Programar código",
-    description: "Construye un pequeño script o componente que resuelva algo cotidiano.",
-    difficulty: "difícil",
-    category: "tecnología",
-    icon: "💻"
-  },
-  {
-    title: "Ilustración digital",
-    description: "Crea una ilustración digital sencilla inspirada en tu estado de ánimo.",
-    difficulty: "medio",
-    category: "arte",
-    icon: "🎨"
-  },
-  {
-    title: "Actualizar blog",
-    description: "Publica una entrada corta en tu blog compartiendo una idea reciente.",
-    difficulty: "medio",
-    category: "escritura",
-    icon: "📝"
-  },
-  {
-    title: "Leer libro",
-    description: "Lee un capítulo o varias páginas de un libro que alimente tu creatividad.",
-    difficulty: "fácil",
-    category: "lectura",
-    icon: "📖"
-  },
-  {
-    title: "Disfrutar libros de arte",
-    description: "Lee o explora durante 20 minutos un libro de arte y anota lo que te inspire.",
-    difficulty: "fácil",
-    category: "lectura",
-    icon: "📚"
-  },
-  {
-    title: "Crear un collage digital",
-    description: "Combina imágenes, texturas y colores en una composición digital propia.",
-    difficulty: "medio",
-    category: "arte",
-    icon: "🖼️"
-  },
-  {
-    title: "Técnicas de arte mixtas",
-    description: "Experimenta mezclando dibujo, pintura, recortes o texturas en una misma pieza.",
-    difficulty: "difícil",
-    category: "arte",
-    icon: "🎭"
-  },
-  {
-    title: "Tocar un instrumento",
-    description: "Dedica 15 minutos a tocar un instrumento, aunque sea improvisando.",
-    difficulty: "medio",
-    category: "música",
-    icon: "🎸"
-  },
-  {
-    title: "Carta de agradecimiento",
-    description: "Escribe una carta de agradecimiento a alguien que haya marcado tu vida.",
-    difficulty: "fácil",
-    category: "escritura",
-    icon: "💌"
-  },
+const DEFAULT_CHALLENGES: Challenge[] = [
+  { title: "Caligrafía artística", description: "Practica 10 minutos de caligrafía decorando una palabra que te inspire hoy.", difficulty: "fácil", category: "arte", icon: "🖋️" },
+  { title: "Escritura creativa", description: "Escribe un micro-relato de exactamente 50 palabras sobre tu día.", difficulty: "medio", category: "escritura", icon: "✍️" },
+  { title: "Aprender un idioma", description: "Dedica 15 minutos a aprender 10 palabras nuevas en otro idioma.", difficulty: "medio", category: "aprendizaje", icon: "🗣️" },
+  { title: "Programar código", description: "Construye un pequeño script o componente que resuelva algo cotidiano.", difficulty: "difícil", category: "tecnología", icon: "💻" },
+  { title: "Ilustración digital", description: "Crea una ilustración digital sencilla inspirada en tu estado de ánimo.", difficulty: "medio", category: "arte", icon: "🎨" },
+  { title: "Actualizar blog", description: "Publica una entrada corta en tu blog compartiendo una idea reciente.", difficulty: "medio", category: "escritura", icon: "📝" },
+  { title: "Leer libro", description: "Lee un capítulo o varias páginas de un libro que alimente tu creatividad.", difficulty: "fácil", category: "lectura", icon: "📖" },
+  { title: "Disfrutar libros de arte", description: "Lee o explora durante 20 minutos un libro de arte y anota lo que te inspire.", difficulty: "fácil", category: "lectura", icon: "📚" },
+  { title: "Crear un collage digital", description: "Combina imágenes, texturas y colores en una composición digital propia.", difficulty: "medio", category: "arte", icon: "🖼️" },
+  { title: "Técnicas de arte mixtas", description: "Experimenta mezclando dibujo, pintura, recortes o texturas en una misma pieza.", difficulty: "difícil", category: "arte", icon: "🎭" },
+  { title: "Tocar un instrumento", description: "Dedica 15 minutos a tocar un instrumento, aunque sea improvisando.", difficulty: "medio", category: "música", icon: "🎸" },
+  { title: "Carta de agradecimiento", description: "Escribe una carta de agradecimiento a alguien que haya marcado tu vida.", difficulty: "fácil", category: "escritura", icon: "💌" },
 ];
 
 // Daily tips
@@ -130,12 +76,55 @@ const WELLNESS_TIPS = [
 const Inspiration = () => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
+  const [challenges, setChallenges] = useState<Challenge[]>(() => {
+    if (typeof window === 'undefined') return DEFAULT_CHALLENGES;
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) return JSON.parse(raw) as Challenge[];
+    } catch {}
+    return DEFAULT_CHALLENGES;
+  });
   const [currentQuote, setCurrentQuote] = useState(QUOTES[0]);
-  const [currentChallenge, setCurrentChallenge] = useState(CHALLENGES[0]);
+  const [currentChallenge, setCurrentChallenge] = useState<Challenge>(challenges[0] ?? DEFAULT_CHALLENGES[0]);
   const [currentTip, setCurrentTip] = useState(WELLNESS_TIPS[0]);
   const [copied, setCopied] = useState(false);
   const [likedQuote, setLikedQuote] = useState(false);
   const [completedChallenges, setCompletedChallenges] = useState<string[]>([]);
+  const [addOpen, setAddOpen] = useState(false);
+  const [newChallenge, setNewChallenge] = useState<Challenge>({
+    title: '', description: '', difficulty: 'fácil', category: 'arte', icon: '✨',
+  });
+
+  useEffect(() => {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(challenges)); } catch {}
+  }, [challenges]);
+
+  const addChallenge = () => {
+    if (!newChallenge.title.trim() || !newChallenge.description.trim()) {
+      toast.error('Completa título y descripción');
+      return;
+    }
+    if (challenges.some(c => c.title === newChallenge.title.trim())) {
+      toast.error('Ya existe un desafío con ese título');
+      return;
+    }
+    const c = { ...newChallenge, title: newChallenge.title.trim(), description: newChallenge.description.trim(), icon: newChallenge.icon.trim() || '✨' };
+    setChallenges([...challenges, c]);
+    setNewChallenge({ title: '', description: '', difficulty: 'fácil', category: 'arte', icon: '✨' });
+    setAddOpen(false);
+    toast.success('Desafío añadido');
+  };
+
+  const removeChallenge = (title: string) => {
+    const next = challenges.filter(c => c.title !== title);
+    if (next.length === 0) {
+      toast.error('Debe quedar al menos un desafío');
+      return;
+    }
+    setChallenges(next);
+    if (currentChallenge.title === title) setCurrentChallenge(next[0]);
+    toast.success('Desafío eliminado');
+  };
 
   useEffect(() => {
     if (!loading && !user) {
@@ -149,7 +138,7 @@ const Inspiration = () => {
     const dayOfYear = Math.floor((today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / 86400000);
     
     setCurrentQuote(QUOTES[dayOfYear % QUOTES.length]);
-    setCurrentChallenge(CHALLENGES[dayOfYear % CHALLENGES.length]);
+    setCurrentChallenge(challenges[dayOfYear % challenges.length]);
     setCurrentTip(WELLNESS_TIPS[dayOfYear % WELLNESS_TIPS.length]);
   }, []);
 
@@ -160,8 +149,8 @@ const Inspiration = () => {
   };
 
   const refreshChallenge = () => {
-    const randomIndex = Math.floor(Math.random() * CHALLENGES.length);
-    setCurrentChallenge(CHALLENGES[randomIndex]);
+    const randomIndex = Math.floor(Math.random() * challenges.length);
+    setCurrentChallenge(challenges[randomIndex]);
   };
 
   const copyQuote = async () => {
@@ -363,16 +352,97 @@ const Inspiration = () => {
               </CardContent>
             </Card>
 
+            {/* Manage challenges */}
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold font-poppins">Todos los desafíos ({challenges.length})</h3>
+              <Dialog open={addOpen} onOpenChange={setAddOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm" className="bg-gradient-creative hover:opacity-90">
+                    <Plus className="h-4 w-4 mr-2" /> Nuevo desafío
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Crear desafío</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-[80px_1fr] gap-3">
+                      <div>
+                        <Label>Icono</Label>
+                        <Input
+                          value={newChallenge.icon}
+                          onChange={(e) => setNewChallenge({ ...newChallenge, icon: e.target.value })}
+                          maxLength={2}
+                          className="text-center text-xl"
+                        />
+                      </div>
+                      <div>
+                        <Label>Título</Label>
+                        <Input
+                          value={newChallenge.title}
+                          onChange={(e) => setNewChallenge({ ...newChallenge, title: e.target.value })}
+                          placeholder="Ej: Pintar acuarela"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label>Descripción</Label>
+                      <Textarea
+                        value={newChallenge.description}
+                        onChange={(e) => setNewChallenge({ ...newChallenge, description: e.target.value })}
+                        placeholder="Qué hay que hacer..."
+                        rows={3}
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label>Dificultad</Label>
+                        <Select value={newChallenge.difficulty} onValueChange={(v) => setNewChallenge({ ...newChallenge, difficulty: v })}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="fácil">Fácil</SelectItem>
+                            <SelectItem value="medio">Medio</SelectItem>
+                            <SelectItem value="difícil">Difícil</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label>Categoría</Label>
+                        <Input
+                          value={newChallenge.category}
+                          onChange={(e) => setNewChallenge({ ...newChallenge, category: e.target.value })}
+                          placeholder="arte, escritura..."
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button variant="outline" onClick={() => setAddOpen(false)}>Cancelar</Button>
+                    <Button onClick={addChallenge}>Añadir</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
+
             {/* Challenges Grid */}
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {CHALLENGES.map((challenge, index) => (
-                <Card 
-                  key={index} 
-                  className={`border-0 shadow-md hover:shadow-lg transition-all cursor-pointer ${
+              {challenges.map((challenge, index) => (
+                <Card
+                  key={index}
+                  className={`group relative border-0 shadow-md hover:shadow-lg transition-all cursor-pointer ${
                     completedChallenges.includes(challenge.title) ? 'ring-2 ring-green-500 bg-green-50' : ''
                   }`}
                   onClick={() => setCurrentChallenge(challenge)}
                 >
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute top-1 right-1 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive"
+                    onClick={(e) => { e.stopPropagation(); removeChallenge(challenge.title); }}
+                    aria-label="Eliminar desafío"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between">
                       <span className="text-2xl">{challenge.icon}</span>
@@ -380,7 +450,7 @@ const Inspiration = () => {
                         <Check className="h-5 w-5 text-green-500" />
                       )}
                     </div>
-                    <h4 className="font-semibold mt-2 font-poppins text-foreground">{challenge.title}</h4>
+                    <h4 className="font-semibold mt-2 font-poppins text-foreground pr-6">{challenge.title}</h4>
                     <Badge className={`mt-2 text-xs ${getDifficultyColor(challenge.difficulty)}`}>
                       {challenge.difficulty}
                     </Badge>
