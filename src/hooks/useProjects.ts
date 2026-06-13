@@ -145,6 +145,23 @@ export const useProjectTasks = (projectId: string) => {
     return true;
   };
 
+  const updateTask = async (taskId: string, updates: Partial<Pick<ProjectTask, 'title' | 'description'>>) => {
+    const { data, error } = await supabase
+      .from('project_tasks')
+      .update(updates)
+      .eq('id', taskId)
+      .select()
+      .single();
+
+    if (error) {
+      toast({ title: 'Error', description: 'No se pudo actualizar la tarea', variant: 'destructive' });
+      return false;
+    }
+
+    setTasks(tasks.map(t => t.id === taskId ? (data as ProjectTask) : t));
+    return true;
+  };
+
   const deleteTask = async (taskId: string) => {
     const { error } = await supabase
       .from('project_tasks')
@@ -160,5 +177,5 @@ export const useProjectTasks = (projectId: string) => {
     return true;
   };
 
-  return { tasks, loading, createTask, updateTaskStatus, deleteTask, refetch: fetchTasks };
+  return { tasks, loading, createTask, updateTask, updateTaskStatus, deleteTask, refetch: fetchTasks };
 };
