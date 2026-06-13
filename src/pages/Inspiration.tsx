@@ -4,12 +4,30 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter,
+} from '@/components/ui/dialog';
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select';
 import { 
   Lightbulb, ArrowLeft, Quote, Palette, Target, RefreshCw, 
-  Heart, Star, Sparkles, BookOpen, Zap, Share2, Copy, Check
+  Heart, Star, Sparkles, BookOpen, Zap, Share2, Copy, Check, Plus, Trash2
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
+
+type Challenge = {
+  title: string;
+  description: string;
+  difficulty: string;
+  category: string;
+  icon: string;
+};
+const STORAGE_KEY = 'lm_challenges_v1';
 
 // Motivational quotes database
 const QUOTES = [
