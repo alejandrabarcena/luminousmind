@@ -46,7 +46,7 @@ const QUOTES = [
 ];
 
 // Creative challenges database
-const DEFAULT_challenges: Challenge[] = [
+const DEFAULT_CHALLENGES: Challenge[] = [
   { title: "Caligrafía artística", description: "Practica 10 minutos de caligrafía decorando una palabra que te inspire hoy.", difficulty: "fácil", category: "arte", icon: "🖋️" },
   { title: "Escritura creativa", description: "Escribe un micro-relato de exactamente 50 palabras sobre tu día.", difficulty: "medio", category: "escritura", icon: "✍️" },
   { title: "Aprender un idioma", description: "Dedica 15 minutos a aprender 10 palabras nuevas en otro idioma.", difficulty: "medio", category: "aprendizaje", icon: "🗣️" },
@@ -77,15 +77,15 @@ const Inspiration = () => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
   const [challenges, setChallenges] = useState<Challenge[]>(() => {
-    if (typeof window === 'undefined') return DEFAULT_challenges;
+    if (typeof window === 'undefined') return DEFAULT_CHALLENGES;
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) return JSON.parse(raw) as Challenge[];
     } catch {}
-    return DEFAULT_challenges;
+    return DEFAULT_CHALLENGES;
   });
   const [currentQuote, setCurrentQuote] = useState(QUOTES[0]);
-  const [currentChallenge, setCurrentChallenge] = useState<Challenge>(challenges[0] ?? DEFAULT_challenges[0]);
+  const [currentChallenge, setCurrentChallenge] = useState<Challenge>(challenges[0] ?? DEFAULT_CHALLENGES[0]);
   const [currentTip, setCurrentTip] = useState(WELLNESS_TIPS[0]);
   const [copied, setCopied] = useState(false);
   const [likedQuote, setLikedQuote] = useState(false);
