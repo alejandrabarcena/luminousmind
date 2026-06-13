@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Pencil } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { useProjects } from '@/hooks/useProjects';
 import { KanbanBoard } from '@/components/projects/KanbanBoard';
+import { EditProjectDialog } from '@/components/projects/EditProjectDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { Project } from '@/types/projects';
 import logoImage from '@/assets/logo.png';
@@ -12,8 +14,10 @@ const ProjectDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { user, loading: authLoading } = useAuth();
+  const { updateProject } = useProjects();
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
+  const [editOpen, setEditOpen] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -83,7 +87,7 @@ const ProjectDetail = () => {
               className="w-4 h-12 rounded-full" 
               style={{ backgroundColor: project.color }}
             />
-            <div>
+            <div className="flex-1">
               <h1 className="text-3xl font-bold font-poppins text-gray-900">
                 {project.title}
               </h1>
@@ -93,12 +97,27 @@ const ProjectDetail = () => {
                 </p>
               )}
             </div>
+            <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
+              <Pencil className="h-4 w-4 mr-2" />
+              Editar
+            </Button>
           </div>
 
           {/* Kanban Board */}
           <KanbanBoard projectId={project.id} />
         </div>
       </main>
+
+      <EditProjectDialog
+        project={project}
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        onSave={async (id, updates) => {
+          const updated = await updateProject(id, updates);
+          if (updated) setProject(updated);
+          return updated;
+        }}
+      />
     </div>
   );
 };

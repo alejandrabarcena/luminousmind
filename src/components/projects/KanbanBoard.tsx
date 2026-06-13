@@ -7,7 +7,7 @@ interface KanbanBoardProps {
 }
 
 export const KanbanBoard = ({ projectId }: KanbanBoardProps) => {
-  const { tasks, loading, createTask, updateTaskStatus, deleteTask } = useProjectTasks(projectId);
+  const { tasks, loading, createTask, updateTask, updateTaskStatus, deleteTask } = useProjectTasks(projectId);
 
   if (loading) {
     return (
@@ -37,6 +37,7 @@ export const KanbanBoard = ({ projectId }: KanbanBoardProps) => {
           onCreateTask={(title) => createTask(title, '', status)}
           onStatusChange={updateTaskStatus}
           onDeleteTask={deleteTask}
+          onUpdateTask={updateTask}
         />
       ))}
     </div>
