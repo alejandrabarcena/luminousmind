@@ -231,7 +231,6 @@ const Index = () => {
               <ul className="space-y-2 text-gray-400 font-raleway">
                 <li><a href="#" className="hover:text-white transition-smooth">Funciones</a></li>
                 <li><a href="#" className="hover:text-white transition-smooth">Precios</a></li>
-                <li><a href="#" className="hover:text-white transition-smooth">Integraciones</a></li>
               </ul>
             </div>
             
@@ -248,7 +247,6 @@ const Index = () => {
               <h3 className="font-semibold mb-4 font-poppins">Empresa</h3>
               <ul className="space-y-2 text-gray-400 font-raleway">
                 <li><a href="#" className="hover:text-white transition-smooth">Nosotros</a></li>
-                <li><a href="#" className="hover:text-white transition-smooth">Carrera</a></li>
                 <li><a href="#" className="hover:text-white transition-smooth">Contacto</a></li>
               </ul>
             </div>
