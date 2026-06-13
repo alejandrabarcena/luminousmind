@@ -177,5 +177,29 @@ export const useProjectTasks = (projectId: string) => {
     return true;
   };
 
-  return { tasks, loading, createTask, updateTask, updateTaskStatus, deleteTask, refetch: fetchTasks };
+  /**
+   * Apply an optimistic reorder/move locally and persist new (status, position)
+   * for every task in `nextTasks`.
+   */
+  const reorderTasks = async (nextTasks: ProjectTask[]) => {
+    setTasks(nextTasks);
+
+    const updates = nextTasks.map((t) =>
+      supabase
+        .from('project_tasks')
+        .update({ status: t.status, position: t.position })
+        .eq('id', t.id)
+    );
+
+    const results = await Promise.all(updates);
+    const failed = results.find((r) => r.error);
+    if (failed) {
+      toast({ title: 'Error', description: 'No se pudo guardar el orden', variant: 'destructive' });
+      fetchTasks();
+      return false;
+    }
+    return true;
+  };
+
+  return { tasks, loading, createTask, updateTask, updateTaskStatus, deleteTask, reorderTasks, refetch: fetchTasks };
 };
