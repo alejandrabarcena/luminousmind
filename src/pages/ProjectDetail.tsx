@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Pencil } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { useProjects } from '@/hooks/useProjects';
 import { KanbanBoard } from '@/components/projects/KanbanBoard';
+import { EditProjectDialog } from '@/components/projects/EditProjectDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { Project } from '@/types/projects';
 import logoImage from '@/assets/logo.png';
