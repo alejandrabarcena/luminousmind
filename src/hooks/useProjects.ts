@@ -83,7 +83,7 @@ export const useProjects = () => {
     return true;
   };
 
-  return { projects, loading, createProject, deleteProject, refetch: fetchProjects };
+  return { projects, loading, createProject, updateProject, deleteProject, refetch: fetchProjects };
 };
 
 export const useProjectTasks = (projectId: string) => {
