@@ -67,6 +67,14 @@ const Dashboard = () => {
       link: "/stats"
     },
     {
+      icon: <Brain className="h-6 w-6" />,
+      title: "Evaluación TDA/TDAH",
+      description: "Cuestionario diario con gráficos",
+      color: "bg-gradient-to-br from-pink-500 to-fuchsia-600",
+      available: true,
+      link: "/assessment"
+    },
+    {
       icon: <Download className="h-6 w-6" />,
       title: "Instalar App",
       description: "Añade Luminous a tu pantalla",
