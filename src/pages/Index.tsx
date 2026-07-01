@@ -1,10 +1,13 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Heart, Users, Target, Sparkles, Sun } from "lucide-react";
+import { Brain, Heart, LayoutDashboard, Target, Sparkles, Sun } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 import heroImage from "@/assets/hero-luminous.jpg";
 import logoImage from "@/assets/logo.png";
 const Index = () => {
+  const { user } = useAuth();
+
   const features = [
     {
       icon: <Target className="h-8 w-8" />,
@@ -25,9 +28,9 @@ const Index = () => {
       color: "bg-gradient-calm"
     },
     {
-      icon: <Users className="h-8 w-8" />,
-      title: "Comunidad Luminosa",
-      description: "Conéctate con otros creadores y comparte tu viaje de crecimiento personal.",
+      icon: <Brain className="h-8 w-8" />,
+      title: "Evaluación TDA/TDAH",
+      description: "Contesta tu cuestionario diario y revisa tus resultados con gráficas claras.",
       color: "bg-gradient-primary"
     }
   ];
@@ -64,16 +67,33 @@ const Index = () => {
           </div>
           
           <div className="flex items-center space-x-4">
-            <Link to="/auth">
-              <Button variant="ghost" className="hidden md:inline-flex">
-                Iniciar Sesión
-              </Button>
-            </Link>
-            <Link to="/auth">
-              <Button variant="hero" className="shadow-lg">
-                Comenzar Gratis
-              </Button>
-            </Link>
+            {user ? (
+              <>
+                <Link to="/assessment">
+                  <Button variant="ghost" className="hidden md:inline-flex">
+                    Evaluación TDA/TDAH
+                  </Button>
+                </Link>
+                <Link to="/dashboard">
+                  <Button variant="hero" className="shadow-lg">
+                    Ir al Dashboard
+                  </Button>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link to="/auth">
+                  <Button variant="ghost" className="hidden md:inline-flex">
+                    Iniciar Sesión
+                  </Button>
+                </Link>
+                <Link to="/auth">
+                  <Button variant="hero" className="shadow-lg">
+                    Comenzar Gratis
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </nav>
@@ -101,15 +121,24 @@ const Index = () => {
               </div>
               
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link to="/auth">
+                <Link to={user ? "/dashboard" : "/auth"}>
                   <Button variant="hero" size="lg" className="text-lg px-8 py-4">
-                    <Sun className="mr-2 h-5 w-5" />
-                    Comienza Tu Viaje
+                    {user ? <LayoutDashboard className="mr-2 h-5 w-5" /> : <Sun className="mr-2 h-5 w-5" />}
+                    {user ? "Ir al Dashboard" : "Comienza Tu Viaje"}
                   </Button>
                 </Link>
-                <Button variant="outline" size="lg" className="text-lg px-8 py-4 border-2">
-                  Ver Demo
-                </Button>
+                {user ? (
+                  <Link to="/assessment">
+                    <Button variant="outline" size="lg" className="text-lg px-8 py-4 border-2">
+                      <Brain className="mr-2 h-5 w-5" />
+                      Evaluación TDA/TDAH
+                    </Button>
+                  </Link>
+                ) : (
+                  <Button variant="outline" size="lg" className="text-lg px-8 py-4 border-2">
+                    Ver Demo
+                  </Button>
+                )}
               </div>
               
               <div className="flex items-center space-x-8 pt-4">
