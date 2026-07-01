@@ -24,6 +24,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const { user, loading, signOut } = useAuth();
   const { isAdmin } = useUserRole();
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -35,6 +36,33 @@ const Dashboard = () => {
     await signOut();
     navigate('/');
   };
+
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setOpen((prev) => !prev);
+      }
+    };
+    document.addEventListener('keydown', down);
+    return () => document.removeEventListener('keydown', down);
+  }, []);
+
+  const searchItems = [
+    { title: "Dashboard", link: "/dashboard", icon: Search },
+    { title: "Proyectos Creativos", link: "/projects", icon: Target },
+    { title: "Rituales de Bienestar", link: "/wellness", icon: Heart },
+    { title: "Inspiración Diaria y Desafíos", link: "/inspiration", icon: Sparkles },
+    { title: "Mi Progreso", link: "/stats", icon: BarChart3 },
+    { title: "Evaluación TDA/TDAH", link: "/assessment", icon: Brain },
+    { title: "Instalar App", link: "/install", icon: Download },
+    ...(isAdmin ? [{ title: "Administración", link: "/admin", icon: Shield }] : []),
+  ];
+
+  const handleSelect = useCallback((link: string) => {
+    setOpen(false);
+    navigate(link);
+  }, [navigate]);
 
   if (loading) {
     return (
@@ -104,6 +132,7 @@ const Dashboard = () => {
       link: "/admin"
     }] : [])
   ];
+
 
   return (
     <SidebarProvider defaultOpen={true}>
