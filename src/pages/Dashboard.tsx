@@ -135,6 +135,7 @@ const Dashboard = () => {
 
 
   return (
+    <>
     <SidebarProvider defaultOpen={true}>
       <div className="min-h-screen flex w-full bg-page">
         <DashboardSidebar />
