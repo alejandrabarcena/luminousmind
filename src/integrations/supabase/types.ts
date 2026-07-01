@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      adhd_assessments: {
+        Row: {
+          answers: Json
+          assessment_date: string
+          created_at: string
+          id: string
+          medication_afternoon: string | null
+          medication_morning: string | null
+          medication_night: string | null
+          notes: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          answers?: Json
+          assessment_date?: string
+          created_at?: string
+          id?: string
+          medication_afternoon?: string | null
+          medication_morning?: string | null
+          medication_night?: string | null
+          notes?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          assessment_date?: string
+          created_at?: string
+          id?: string
+          medication_afternoon?: string | null
+          medication_morning?: string | null
+          medication_night?: string | null
+          notes?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       habit_logs: {
         Row: {
           completed_at: string
