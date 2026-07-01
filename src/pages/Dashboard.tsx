@@ -157,7 +157,7 @@ const Dashboard = () => {
               <Button
                 variant="outline"
                 size="sm"
-                className="h-9 w-9 md:h-10 md:w-auto md:px-3 justify-center gap-2 text-muted-foreground"
+                className="h-9 w-9 md:h-10 md:w-auto md:px-3 justify-center gap-2 text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 min-h-11 min-w-11 md:min-h-10 md:min-w-0"
                 onClick={() => setOpen(true)}
                 aria-label="Buscar sección"
               >
