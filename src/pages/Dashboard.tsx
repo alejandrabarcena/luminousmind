@@ -251,6 +251,25 @@ const Dashboard = () => {
         </div>
       </div>
     </SidebarProvider>
+
+    <CommandDialog open={open} onOpenChange={setOpen}>
+      <CommandInput placeholder="Buscar sección... (ej. TDA, Evaluación)" />
+      <CommandList>
+        <CommandEmpty>No se encontró ninguna sección.</CommandEmpty>
+        <CommandGroup heading="Secciones del dashboard">
+          {searchItems.map((item) => (
+            <CommandItem
+              key={item.title}
+              onSelect={() => handleSelect(item.link)}
+              className="cursor-pointer"
+            >
+              <item.icon className="mr-2 h-4 w-4" />
+              <span>{item.title}</span>
+            </CommandItem>
+          ))}
+        </CommandGroup>
+      </CommandList>
+    </CommandDialog>
   );
 };
 
