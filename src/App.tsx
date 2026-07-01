@@ -16,6 +16,7 @@ import Install from "./pages/Install";
 import Inspiration from "./pages/Inspiration";
 import Admin from "./pages/Admin";
 import Profile from "./pages/Profile";
+import Assessment from "./pages/Assessment";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,6 +41,7 @@ const App = () => (
               <Route path="/inspiration" element={<Inspiration />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/assessment" element={<Assessment />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

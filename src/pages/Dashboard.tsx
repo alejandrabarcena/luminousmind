@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Target, Heart, Sparkles, LogOut, User, BarChart3, Download, Shield } from 'lucide-react';
+import { Target, Heart, Sparkles, LogOut, User, BarChart3, Download, Shield, Brain } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
 import logoImage from '@/assets/logo.png';
@@ -65,6 +65,14 @@ const Dashboard = () => {
       color: "bg-gradient-to-br from-purple-500 to-indigo-500",
       available: true,
       link: "/stats"
+    },
+    {
+      icon: <Brain className="h-6 w-6" />,
+      title: "Evaluación TDA/TDAH",
+      description: "Cuestionario diario con gráficos",
+      color: "bg-gradient-to-br from-pink-500 to-fuchsia-600",
+      available: true,
+      link: "/assessment"
     },
     {
       icon: <Download className="h-6 w-6" />,
