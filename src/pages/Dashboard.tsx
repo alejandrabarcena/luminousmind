@@ -1,15 +1,24 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import {
-  Target, Heart, Sparkles, LogOut, User, BarChart3, Download, Shield, Brain,
+  Target, Heart, Sparkles, LogOut, User, BarChart3, Download, Shield, Brain, Search, Command,
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
+import {
+  CommandDialog,
+  CommandInput,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+} from '@/components/ui/command';
 import logoImage from '@/assets/logo.png';
+
 
 const Dashboard = () => {
   const navigate = useNavigate();
