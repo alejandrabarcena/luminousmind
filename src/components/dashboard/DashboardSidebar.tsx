@@ -47,7 +47,7 @@ export function DashboardSidebar() {
   return (
     <Sidebar collapsible="icon" className="border-r border-border">
       <SidebarContent>
-        <SidebarGroup defaultOpen>
+        <SidebarGroup>
           <SidebarGroupLabel className="font-poppins text-xs uppercase tracking-wide text-muted-foreground">
             Menú
           </SidebarGroupLabel>
