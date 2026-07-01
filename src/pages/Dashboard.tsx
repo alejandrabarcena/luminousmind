@@ -2,9 +2,13 @@ import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Target, Heart, Sparkles, LogOut, User, BarChart3, Download, Shield, Brain } from 'lucide-react';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import {
+  Target, Heart, Sparkles, LogOut, User, BarChart3, Download, Shield, Brain,
+} from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
+import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import logoImage from '@/assets/logo.png';
 
 const Dashboard = () => {
@@ -93,102 +97,109 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-page">
-      {/* Navigation */}
-      <nav className="px-6 py-4 bg-nav">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <img src={logoImage} alt="Luminous Mind" className="h-10 w-10 object-contain" />
-            <span className="text-xl font-bold font-poppins bg-gradient-primary bg-clip-text text-transparent">
-              Luminous Mind
-            </span>
-          </div>
-          
-          <div className="flex items-center space-x-4">
-            <Link 
-              to="/profile" 
-              className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
-            >
-              <User className="h-5 w-5" />
-              <span className="font-medium">{user.email}</span>
-            </Link>
-            <Button variant="ghost" onClick={handleSignOut}>
-              <LogOut className="h-5 w-5 mr-2" />
-              Cerrar Sesión
-            </Button>
-          </div>
-        </div>
-      </nav>
+    <SidebarProvider defaultOpen={true}>
+      <div className="min-h-screen flex w-full bg-page">
+        <DashboardSidebar />
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 py-12">
-        <div className="space-y-8">
-          {/* Welcome */}
-          <div className="space-y-2">
-            <h1 className="text-4xl font-bold font-poppins text-foreground">
-              ¡Hola! 👋
-            </h1>
-            <p className="text-xl text-muted-foreground font-raleway">
-              Bienvenido a tu espacio de creatividad y bienestar
-            </p>
-          </div>
-
-          {/* Quick Actions */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {quickActions.map((action, index) => (
-              <Link 
-                key={index} 
-                to={action.link}
-                className={!action.available ? 'pointer-events-none' : ''}
-              >
-                <Card 
-                  className={`border-0 shadow-lg hover:shadow-xl transition-all duration-300 h-full ${
-                    action.available ? 'cursor-pointer hover:-translate-y-1' : 'opacity-75'
-                  }`}
-                >
-                  <CardHeader className="pb-2">
-                    <div className={`w-12 h-12 ${action.color} rounded-xl flex items-center justify-center text-white mb-3`}>
-                      {action.icon}
-                    </div>
-                    <CardTitle className="text-lg font-poppins flex items-center justify-between">
-                      {action.title}
-                      {!action.available && (
-                        <span className="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full font-normal">
-                          Próximamente
-                        </span>
-                      )}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground font-raleway text-sm">
-                      {action.description}
-                    </p>
-                  </CardContent>
-                </Card>
+        <div className="flex-1 flex flex-col min-w-0">
+          {/* Header */}
+          <header className="h-16 px-4 md:px-6 border-b border-border bg-card flex items-center justify-between shrink-0">
+            <div className="flex items-center gap-3">
+              <SidebarTrigger className="-ml-1" />
+              <Link to="/" className="flex items-center gap-2 md:hidden">
+                <img src={logoImage} alt="Luminous Mind" className="h-8 w-8 object-contain" />
+                <span className="text-lg font-bold font-poppins bg-gradient-primary bg-clip-text text-transparent">
+                  Luminous Mind
+                </span>
               </Link>
-            ))}
-          </div>
+            </div>
 
-          {/* Placeholder Content */}
-          <Card className="border-0 shadow-lg">
-            <CardContent className="p-12 text-center">
-              <div className="space-y-4">
-                <div className="w-20 h-20 bg-gradient-primary rounded-full mx-auto flex items-center justify-center">
-                  <Sparkles className="h-10 w-10 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold font-poppins text-foreground">
-                  Tu viaje comienza aquí
-                </h3>
-                <p className="text-muted-foreground font-raleway max-w-md mx-auto">
-                  Pronto podrás crear proyectos creativos, establecer rituales de bienestar 
-                  y recibir inspiración diaria personalizada.
+            <div className="flex items-center gap-2 md:gap-4">
+              <Link
+                to="/profile"
+                className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <User className="h-5 w-5" />
+                <span className="font-medium hidden md:inline text-sm">{user.email}</span>
+              </Link>
+              <Button variant="ghost" size="sm" onClick={handleSignOut}>
+                <LogOut className="h-5 w-5 mr-2" />
+                <span className="hidden md:inline">Cerrar Sesión</span>
+              </Button>
+            </div>
+          </header>
+
+          {/* Main Content */}
+          <main className="flex-1 overflow-auto p-4 md:p-8 lg:p-12">
+            <div className="max-w-7xl mx-auto space-y-8">
+              {/* Welcome */}
+              <div className="space-y-2">
+                <h1 className="text-3xl md:text-4xl font-bold font-poppins text-foreground">
+                  ¡Hola! 👋
+                </h1>
+                <p className="text-lg md:text-xl text-muted-foreground font-raleway">
+                  Bienvenido a tu espacio de creatividad y bienestar
                 </p>
               </div>
-            </CardContent>
-          </Card>
+
+              {/* Quick Actions */}
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                {quickActions.map((action, index) => (
+                  <Link
+                    key={index}
+                    to={action.link}
+                    className={!action.available ? 'pointer-events-none' : ''}
+                  >
+                    <Card
+                      className={`border-0 shadow-lg hover:shadow-xl transition-all duration-300 h-full ${
+                        action.available ? 'cursor-pointer hover:-translate-y-1' : 'opacity-75'
+                      }`}
+                    >
+                      <CardHeader className="pb-2">
+                        <div className={`w-12 h-12 ${action.color} rounded-xl flex items-center justify-center text-white mb-3`}>
+                          {action.icon}
+                        </div>
+                        <CardTitle className="text-lg font-poppins flex items-center justify-between">
+                          {action.title}
+                          {!action.available && (
+                            <span className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded-full font-normal">
+                              Próximamente
+                            </span>
+                          )}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-muted-foreground font-raleway text-sm">
+                          {action.description}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
+
+              {/* Placeholder Content */}
+              <Card className="border-0 shadow-lg">
+                <CardContent className="p-8 md:p-12 text-center">
+                  <div className="space-y-4">
+                    <div className="w-20 h-20 bg-gradient-primary rounded-full mx-auto flex items-center justify-center">
+                      <Sparkles className="h-10 w-10 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-bold font-poppins text-foreground">
+                      Tu viaje comienza aquí
+                    </h3>
+                    <p className="text-muted-foreground font-raleway max-w-md mx-auto">
+                      Pronto podrás crear proyectos creativos, establecer rituales de bienestar
+                      y recibir inspiración diaria personalizada.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </main>
         </div>
-      </main>
-    </div>
+      </div>
+    </SidebarProvider>
   );
 };
 
