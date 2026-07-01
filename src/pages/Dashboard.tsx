@@ -1,20 +1,30 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import {
-  Target, Heart, Sparkles, LogOut, User, BarChart3, Download, Shield, Brain,
+  Target, Heart, Sparkles, LogOut, User, BarChart3, Download, Shield, Brain, Search, Command,
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
+import {
+  CommandDialog,
+  CommandInput,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+} from '@/components/ui/command';
 import logoImage from '@/assets/logo.png';
+
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, loading, signOut } = useAuth();
   const { isAdmin } = useUserRole();
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -26,6 +36,33 @@ const Dashboard = () => {
     await signOut();
     navigate('/');
   };
+
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setOpen((prev) => !prev);
+      }
+    };
+    document.addEventListener('keydown', down);
+    return () => document.removeEventListener('keydown', down);
+  }, []);
+
+  const searchItems = [
+    { title: "Dashboard", link: "/dashboard", icon: Search },
+    { title: "Proyectos Creativos", link: "/projects", icon: Target },
+    { title: "Rituales de Bienestar", link: "/wellness", icon: Heart },
+    { title: "Inspiración Diaria y Desafíos", link: "/inspiration", icon: Sparkles },
+    { title: "Mi Progreso", link: "/stats", icon: BarChart3 },
+    { title: "Evaluación TDA/TDAH", link: "/assessment", icon: Brain },
+    { title: "Instalar App", link: "/install", icon: Download },
+    ...(isAdmin ? [{ title: "Administración", link: "/admin", icon: Shield }] : []),
+  ];
+
+  const handleSelect = useCallback((link: string) => {
+    setOpen(false);
+    navigate(link);
+  }, [navigate]);
 
   if (loading) {
     return (
@@ -96,7 +133,9 @@ const Dashboard = () => {
     }] : [])
   ];
 
+
   return (
+    <>
     <SidebarProvider defaultOpen={true}>
       <div className="min-h-screen flex w-full bg-page">
         <DashboardSidebar />
@@ -115,6 +154,19 @@ const Dashboard = () => {
             </div>
 
             <div className="flex items-center gap-2 md:gap-4">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-9 w-9 md:h-10 md:w-auto md:px-3 justify-center gap-2 text-muted-foreground"
+                onClick={() => setOpen(true)}
+                aria-label="Buscar sección"
+              >
+                <Search className="h-4 w-4" />
+                <span className="hidden md:inline text-sm">Buscar...</span>
+                <kbd className="hidden md:inline-flex h-5 items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
+                  <Command className="h-3 w-3" />K
+                </kbd>
+              </Button>
               <Link
                 to="/profile"
                 className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
@@ -200,6 +252,26 @@ const Dashboard = () => {
         </div>
       </div>
     </SidebarProvider>
+
+    <CommandDialog open={open} onOpenChange={setOpen}>
+      <CommandInput placeholder="Buscar sección... (ej. TDA, Evaluación)" />
+      <CommandList>
+        <CommandEmpty>No se encontró ninguna sección.</CommandEmpty>
+        <CommandGroup heading="Secciones del dashboard">
+          {searchItems.map((item) => (
+            <CommandItem
+              key={item.title}
+              onSelect={() => handleSelect(item.link)}
+              className="cursor-pointer"
+            >
+              <item.icon className="mr-2 h-4 w-4" />
+              <span>{item.title}</span>
+            </CommandItem>
+          ))}
+        </CommandGroup>
+      </CommandList>
+    </CommandDialog>
+    </>
   );
 };
 
