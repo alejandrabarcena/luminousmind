@@ -70,8 +70,9 @@ const Index = () => {
             {user ? (
               <>
                 <Link to="/assessment">
-                  <Button variant="ghost" className="hidden md:inline-flex">
-                    Evaluación TDA/TDAH
+                  <Button variant="ghost" size="sm" className="whitespace-nowrap">
+                    <Brain className="h-4 w-4 md:mr-2" />
+                    <span className="hidden sm:inline">Evaluación TDA/TDAH</span>
                   </Button>
                 </Link>
                 <Link to="/dashboard">
