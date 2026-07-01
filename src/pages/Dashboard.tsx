@@ -271,6 +271,7 @@ const Dashboard = () => {
         </CommandGroup>
       </CommandList>
     </CommandDialog>
+    </>
   );
 };
 
