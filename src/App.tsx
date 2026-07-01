@@ -16,6 +16,7 @@ import Install from "./pages/Install";
 import Inspiration from "./pages/Inspiration";
 import Admin from "./pages/Admin";
 import Profile from "./pages/Profile";
+import Assessment from "./pages/Assessment";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
