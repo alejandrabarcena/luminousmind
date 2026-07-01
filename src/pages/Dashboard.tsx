@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Target, Heart, Sparkles, LogOut, User, BarChart3, Download, Shield } from 'lucide-react';
+import { Target, Heart, Sparkles, LogOut, User, BarChart3, Download, Shield, Brain } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
 import logoImage from '@/assets/logo.png';
