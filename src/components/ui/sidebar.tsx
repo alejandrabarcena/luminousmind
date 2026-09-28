@@ -277,7 +277,7 @@ const SidebarTrigger = React.forwardRef<
       {...props}
     >
       <PanelLeft />
-      <span className="sr-only">Toggle Sidebar</span>
+      <span className="sr-only">Abrir o cerrar menú de navegación</span>
     </Button>
   )
 })
