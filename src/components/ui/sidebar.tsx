@@ -192,7 +192,7 @@ const Sidebar = React.forwardRef<
 
     if (isMobile) {
       return (
-        <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
+        <Sheet open={openMobile} onOpenChange={setOpenMobile} modal={false} {...props}>
           <SheetContent
             data-sidebar="sidebar"
             data-mobile="true"
@@ -277,7 +277,7 @@ const SidebarTrigger = React.forwardRef<
       {...props}
     >
       <PanelLeft />
-      <span className="sr-only">Toggle Sidebar</span>
+      <span className="sr-only">Abrir o cerrar menú de navegación</span>
     </Button>
   )
 })
