@@ -144,7 +144,7 @@ const Dashboard = () => {
           {/* Header */}
           <header className="h-16 px-4 md:px-6 border-b border-border bg-card flex items-center justify-between shrink-0">
             <div className="flex items-center gap-3">
-              <SidebarTrigger className="-ml-1" />
+              <SidebarTrigger className="-ml-1 min-h-11 min-w-11" aria-label="Abrir menú de navegación" />
               <Link to="/" className="flex items-center gap-2 md:hidden">
                 <img src={logoImage} alt="Luminous Mind" className="h-8 w-8 object-contain" />
                 <span className="text-lg font-bold font-poppins bg-gradient-primary bg-clip-text text-transparent">
