@@ -103,20 +103,26 @@ const Assessment = () => {
       setMedAfternoon(today.medication_afternoon || '');
       setMedNight(today.medication_night || '');
       setNotes(today.notes || '');
-    }
-    try {
-      const raw = localStorage.getItem(`adhd-draft:${user.id}:${todayISO()}`);
-      if (raw) {
-        const d = JSON.parse(raw);
-        setAnswers(d.answers || {});
-        setMedMorning(d.medMorning || '');
-        setMedAfternoon(d.medAfternoon || '');
-        setMedNight(d.medNight || '');
-        setNotes(d.notes || '');
-        setDraftSavedAt(d.savedAt || null);
-        toast.info('Retomamos tu progreso guardado');
+      if (today.updated_at) setDraftSavedAt(today.updated_at);
+      if (Object.keys(today.answers || {}).length > 0) {
+        toast.info('Retomamos tu progreso guardado en tu cuenta');
       }
-    } catch { /* ignore */ }
+    } else {
+      // Respaldo local solo si no hay nada en la cuenta (p. ej. sin conexión)
+      try {
+        const raw = localStorage.getItem(`adhd-draft:${user.id}:${todayISO()}`);
+        if (raw) {
+          const d = JSON.parse(raw);
+          setAnswers(d.answers || {});
+          setMedMorning(d.medMorning || '');
+          setMedAfternoon(d.medAfternoon || '');
+          setMedNight(d.medNight || '');
+          setNotes(d.notes || '');
+          setDraftSavedAt(d.savedAt || null);
+          toast.info('Retomamos tu progreso guardado en este dispositivo');
+        }
+      } catch { /* ignore */ }
+    }
     setDraftReady(true);
     const { data: hist } = await db
       .from('adhd_assessments')
@@ -133,16 +139,36 @@ const Assessment = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
-  // Autosave draft locally so answers survive closing the page
+  // Autosave draft to the account (debounced) so answers sync across devices;
+  // localStorage kept as offline backup
   useEffect(() => {
-    if (!draftReady || !draftKey) return;
+    if (!draftReady || !user) return;
     const savedAt = new Date().toISOString();
-    localStorage.setItem(
-      draftKey,
-      JSON.stringify({ answers, medMorning, medAfternoon, medNight, notes, savedAt }),
-    );
-    setDraftSavedAt(savedAt);
-  }, [draftReady, draftKey, answers, medMorning, medAfternoon, medNight, notes]);
+    if (draftKey) {
+      localStorage.setItem(
+        draftKey,
+        JSON.stringify({ answers, medMorning, medAfternoon, medNight, notes, savedAt }),
+      );
+    }
+    const timer = setTimeout(async () => {
+      const { error } = await db
+        .from('adhd_assessments')
+        .upsert(
+          {
+            user_id: user.id,
+            assessment_date: todayISO(),
+            answers,
+            medication_morning: medMorning,
+            medication_afternoon: medAfternoon,
+            medication_night: medNight,
+            notes,
+          },
+          { onConflict: 'user_id,assessment_date' },
+        );
+      if (!error) setDraftSavedAt(new Date().toISOString());
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, [draftReady, draftKey, user, answers, medMorning, medAfternoon, medNight, notes]);
 
   const generateSummary = async () => {
     const list = QUESTIONS.filter((q) => typeof answers[q.id] === 'number').map((q) => ({
