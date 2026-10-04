@@ -231,7 +231,7 @@ const Assessment = () => {
       toast.error('Error al guardar');
       console.error(error);
     } else {
-      toast.success('Progreso guardado. Puedes retomarlo hoy cuando quieras.');
+      toast.success('Progreso guardado en tu cuenta. Retómalo desde cualquier dispositivo.');
       if (draftKey) localStorage.removeItem(draftKey);
       loadData();
     }
@@ -385,7 +385,7 @@ const Assessment = () => {
                 {answered}/{QUESTIONS.length} respondidas
                 {draftSavedAt && (
                   <span className="block text-xs">
-                    Progreso guardado en este dispositivo · {new Date(draftSavedAt).toLocaleTimeString()}
+                    Progreso guardado en tu cuenta · {new Date(draftSavedAt).toLocaleTimeString()}
                   </span>
                 )}
               </span>
