@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Save, Brain, Loader2, MessageCircleQuestion } from 'lucide-react';
+import { ArrowLeft, Save, Brain, Loader2, MessageCircleQuestion, History } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -82,6 +82,7 @@ const Assessment = () => {
   const [consent, setConsent] = useState(false);
   const [summary, setSummary] = useState('');
   const [summarizing, setSummarizing] = useState(false);
+  const [viewDate, setViewDate] = useState<string | null>(null);
   const draftKey = user ? `adhd-draft:${user.id}:${todayISO()}` : '';
 
   useEffect(() => {
@@ -321,6 +322,7 @@ const Assessment = () => {
           <TabsList className="bg-white shadow-md">
             <TabsTrigger value="form">Cuestionario</TabsTrigger>
             <TabsTrigger value="charts">Resultados</TabsTrigger>
+            <TabsTrigger value="history">Historial</TabsTrigger>
             <TabsTrigger value="ai">Resumen IA</TabsTrigger>
           </TabsList>
 
