@@ -80,7 +80,13 @@ const Assessment = () => {
   const [draftReady, setDraftReady] = useState(false);
   const [draftSavedAt, setDraftSavedAt] = useState<string | null>(null);
   const [consent, setConsent] = useState(false);
-  const [summary, setSummary] = useState('');
+  type SummaryData = {
+    resumen: string;
+    patrones: string[];
+    preguntas: { pregunta: string; contexto: string; respuesta_sugerida: string }[];
+    recordatorio: string;
+  };
+  const [summary, setSummary] = useState<SummaryData | null>(null);
   const [summarizing, setSummarizing] = useState(false);
   const [viewDate, setViewDate] = useState<string | null>(null);
   const draftKey = user ? `adhd-draft:${user.id}:${todayISO()}` : '';
@@ -177,7 +183,7 @@ const Assessment = () => {
     }));
     if (list.length === 0) { toast.error('Responde al menos una pregunta'); return; }
     setSummarizing(true);
-    setSummary('');
+    setSummary(null);
     const hist = history.slice(0, 14).map((h) => {
       const byCat: Record<string, number[]> = {};
       QUESTIONS.forEach((q) => {
@@ -589,15 +595,31 @@ const Assessment = () => {
                   <p className="text-xs text-muted-foreground">Responde el cuestionario primero.</p>
                 )}
                 {summary && (
-                  <div className="rounded-xl border bg-card p-5 space-y-2 font-raleway">
-                    {summary.split('\n').map((line, i) => {
-                      const t = line.trim();
-                      if (!t) return null;
-                      if (t.startsWith('#')) return <h3 key={i} className="font-poppins font-semibold text-lg pt-2">{t.replace(/^#+\s*/, '')}</h3>;
-                      const clean = t.replace(/\*\*(.+?)\*\*/g, '$1');
-                      if (/^[-*]\s|^\d+\.\s/.test(t)) return <p key={i} className="pl-4">• {clean.replace(/^[-*]\s|^\d+\.\s/, '')}</p>;
-                      return <p key={i}>{clean}</p>;
-                    })}
+                  <div className="space-y-4 font-raleway">
+                    <div className="rounded-xl border bg-card p-5 space-y-2">
+                      <h3 className="font-poppins font-semibold text-lg">Resumen orientativo</h3>
+                      <p className="text-sm">{summary.resumen}</p>
+                    </div>
+                    <div className="rounded-xl border bg-card p-5 space-y-2">
+                      <h3 className="font-poppins font-semibold text-lg">Patrones que destacan</h3>
+                      <ul className="space-y-1 text-sm">
+                        {summary.patrones.map((p, i) => <li key={i} className="pl-4">• {p}</li>)}
+                      </ul>
+                    </div>
+                    <div className="rounded-xl border bg-card p-5 space-y-3">
+                      <h3 className="font-poppins font-semibold text-lg">Preguntas para conversar con tu profesional</h3>
+                      {summary.preguntas.map((q, i) => (
+                        <div key={i} className="rounded-lg bg-muted/50 p-4 space-y-2">
+                          <p className="font-medium text-sm">❓ {q.pregunta}</p>
+                          <p className="text-xs text-muted-foreground">{q.contexto}</p>
+                          <div className="text-sm border-l-2 border-accent pl-3">
+                            <span className="text-xs font-semibold text-muted-foreground block">Cómo podrías contarlo:</span>
+                            {q.respuesta_sugerida}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-xs text-muted-foreground italic">{summary.recordatorio}</p>
                   </div>
                 )}
               </CardContent>
