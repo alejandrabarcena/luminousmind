@@ -7,7 +7,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Save, Brain } from 'lucide-react';
+import { ArrowLeft, Save, Brain, Loader2, MessageCircleQuestion } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -76,6 +77,12 @@ const Assessment = () => {
   const [saving, setSaving] = useState(false);
   const [history, setHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [draftReady, setDraftReady] = useState(false);
+  const [draftSavedAt, setDraftSavedAt] = useState<string | null>(null);
+  const [consent, setConsent] = useState(false);
+  const [summary, setSummary] = useState('');
+  const [summarizing, setSummarizing] = useState(false);
+  const draftKey = user ? `adhd-draft:${user.id}:${todayISO()}` : '';
 
   useEffect(() => {
     if (!authLoading && !user) navigate('/auth');
@@ -97,6 +104,20 @@ const Assessment = () => {
       setMedNight(today.medication_night || '');
       setNotes(today.notes || '');
     }
+    try {
+      const raw = localStorage.getItem(`adhd-draft:${user.id}:${todayISO()}`);
+      if (raw) {
+        const d = JSON.parse(raw);
+        setAnswers(d.answers || {});
+        setMedMorning(d.medMorning || '');
+        setMedAfternoon(d.medAfternoon || '');
+        setMedNight(d.medNight || '');
+        setNotes(d.notes || '');
+        setDraftSavedAt(d.savedAt || null);
+        toast.info('Retomamos tu progreso guardado');
+      }
+    } catch { /* ignore */ }
+    setDraftReady(true);
     const { data: hist } = await db
       .from('adhd_assessments')
       .select('*')
@@ -111,6 +132,54 @@ const Assessment = () => {
     if (user) loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+
+  // Autosave draft locally so answers survive closing the page
+  useEffect(() => {
+    if (!draftReady || !draftKey) return;
+    const savedAt = new Date().toISOString();
+    localStorage.setItem(
+      draftKey,
+      JSON.stringify({ answers, medMorning, medAfternoon, medNight, notes, savedAt }),
+    );
+    setDraftSavedAt(savedAt);
+  }, [draftReady, draftKey, answers, medMorning, medAfternoon, medNight, notes]);
+
+  const generateSummary = async () => {
+    const list = QUESTIONS.filter((q) => typeof answers[q.id] === 'number').map((q) => ({
+      category: q.category, question: q.text, value: answers[q.id],
+    }));
+    if (list.length === 0) { toast.error('Responde al menos una pregunta'); return; }
+    setSummarizing(true);
+    setSummary('');
+    const hist = history.slice(0, 14).map((h) => {
+      const byCat: Record<string, number[]> = {};
+      QUESTIONS.forEach((q) => {
+        const v = h.answers?.[q.id];
+        if (typeof v === 'number') (byCat[q.category] ||= []).push(v);
+      });
+      return {
+        fecha: h.assessment_date,
+        promedios: Object.fromEntries(Object.entries(byCat).map(([c, v]) => [c, +(v.reduce((a, b) => a + b, 0) / v.length).toFixed(1)])),
+      };
+    });
+    const { data, error } = await supabase.functions.invoke('adhd-summary', {
+      body: {
+        answers: list,
+        medication: { manana: medMorning, tarde: medAfternoon, noche: medNight },
+        notes,
+        history: hist,
+      },
+    });
+    setSummarizing(false);
+    if (error) {
+      let msg = 'No se pudo generar el resumen';
+      try { const b = await (error as any).context?.json(); if (b?.error) msg = b.error; } catch { /* ignore */ }
+      toast.error(msg);
+      return;
+    }
+    if (data?.error) { toast.error(data.error); return; }
+    setSummary(data?.summary || '');
+  };
 
   const handleAnswer = (id: number, value: number) => {
     setAnswers((p) => ({ ...p, [id]: value }));
@@ -136,7 +205,8 @@ const Assessment = () => {
       toast.error('Error al guardar');
       console.error(error);
     } else {
-      toast.success('Cuestionario guardado');
+      toast.success('Progreso guardado. Puedes retomarlo hoy cuando quieras.');
+      if (draftKey) localStorage.removeItem(draftKey);
       loadData();
     }
   };
@@ -225,6 +295,7 @@ const Assessment = () => {
           <TabsList className="bg-white shadow-md">
             <TabsTrigger value="form">Cuestionario</TabsTrigger>
             <TabsTrigger value="charts">Resultados</TabsTrigger>
+            <TabsTrigger value="ai">Resumen IA</TabsTrigger>
           </TabsList>
 
           <TabsContent value="form" className="space-y-6">
@@ -286,10 +357,15 @@ const Assessment = () => {
             <div className="flex items-center justify-between sticky bottom-4 bg-white/80 backdrop-blur p-3 rounded-xl shadow-lg">
               <span className="text-sm text-muted-foreground">
                 {answered}/{QUESTIONS.length} respondidas
+                {draftSavedAt && (
+                  <span className="block text-xs">
+                    Progreso guardado en este dispositivo · {new Date(draftSavedAt).toLocaleTimeString()}
+                  </span>
+                )}
               </span>
               <Button onClick={save} disabled={saving} className="bg-gradient-primary">
                 <Save className="h-4 w-4 mr-2" />
-                {saving ? 'Guardando...' : 'Guardar hoy'}
+                {saving ? 'Guardando...' : 'Guardar progreso'}
               </Button>
             </div>
           </TabsContent>
@@ -373,6 +449,48 @@ const Assessment = () => {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+          <TabsContent value="ai" className="space-y-6">
+            <Card className="border-0 shadow-lg">
+              <CardHeader>
+                <CardTitle className="font-poppins flex items-center gap-2">
+                  <MessageCircleQuestion className="h-5 w-5" aria-hidden="true" />
+                  Resumen orientativo con IA
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-muted-foreground font-raleway">
+                  Comparte tus respuestas de hoy (y tu historial reciente) para recibir un resumen de patrones y
+                  preguntas para conversar con tu profesional de salud. <strong>No es un diagnóstico</strong> ni
+                  sustituye la atención profesional. Tus respuestas no se guardan en el resumen.
+                </p>
+                <div className="flex items-start gap-2">
+                  <Checkbox id="ai-consent" checked={consent} onCheckedChange={(v) => setConsent(v === true)} />
+                  <Label htmlFor="ai-consent" className="text-sm leading-snug cursor-pointer">
+                    Acepto compartir mis respuestas con la IA de Luminous Mind para generar este resumen.
+                  </Label>
+                </div>
+                <Button onClick={generateSummary} disabled={!consent || summarizing || answered === 0} className="bg-gradient-primary">
+                  {summarizing ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Brain className="h-4 w-4 mr-2" />}
+                  {summarizing ? 'Generando resumen...' : 'Generar resumen'}
+                </Button>
+                {answered === 0 && (
+                  <p className="text-xs text-muted-foreground">Responde el cuestionario primero.</p>
+                )}
+                {summary && (
+                  <div className="rounded-xl border bg-card p-5 space-y-2 font-raleway">
+                    {summary.split('\n').map((line, i) => {
+                      const t = line.trim();
+                      if (!t) return null;
+                      if (t.startsWith('#')) return <h3 key={i} className="font-poppins font-semibold text-lg pt-2">{t.replace(/^#+\s*/, '')}</h3>;
+                      const clean = t.replace(/\*\*(.+?)\*\*/g, '$1');
+                      if (/^[-*]\s|^\d+\.\s/.test(t)) return <p key={i} className="pl-4">• {clean.replace(/^[-*]\s|^\d+\.\s/, '')}</p>;
+                      return <p key={i}>{clean}</p>;
+                    })}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </main>
