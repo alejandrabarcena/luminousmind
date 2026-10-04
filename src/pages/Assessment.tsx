@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Save, Brain, Loader2, MessageCircleQuestion } from 'lucide-react';
+import { ArrowLeft, Save, Brain, Loader2, MessageCircleQuestion, History } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -82,6 +82,7 @@ const Assessment = () => {
   const [consent, setConsent] = useState(false);
   const [summary, setSummary] = useState('');
   const [summarizing, setSummarizing] = useState(false);
+  const [viewDate, setViewDate] = useState<string | null>(null);
   const draftKey = user ? `adhd-draft:${user.id}:${todayISO()}` : '';
 
   useEffect(() => {
@@ -321,6 +322,7 @@ const Assessment = () => {
           <TabsList className="bg-white shadow-md">
             <TabsTrigger value="form">Cuestionario</TabsTrigger>
             <TabsTrigger value="charts">Resultados</TabsTrigger>
+            <TabsTrigger value="history">Historial</TabsTrigger>
             <TabsTrigger value="ai">Resumen IA</TabsTrigger>
           </TabsList>
 
@@ -476,6 +478,89 @@ const Assessment = () => {
               </Card>
             </div>
           </TabsContent>
+          <TabsContent value="history" className="space-y-6">
+            <Card className="border-0 shadow-lg">
+              <CardHeader>
+                <CardTitle className="font-poppins flex items-center gap-2">
+                  <History className="h-5 w-5" aria-hidden="true" />
+                  Sesiones anteriores
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {history.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">Aún no tienes evaluaciones guardadas.</p>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {history.map((h) => {
+                      const n = Object.keys(h.answers || {}).length;
+                      const active = viewDate === h.assessment_date;
+                      return (
+                        <Button
+                          key={h.id}
+                          variant={active ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setViewDate(active ? null : h.assessment_date)}
+                          className={active ? 'bg-gradient-primary' : ''}
+                        >
+                          {new Date(h.assessment_date + 'T12:00:00').toLocaleDateString('es-MX', {
+                            day: 'numeric', month: 'short', year: 'numeric',
+                          })}
+                          <span className="ml-1 text-xs opacity-70">({n}/29)</span>
+                        </Button>
+                      );
+                    })}
+                  </div>
+                )}
+                {viewDate && (() => {
+                  const h = history.find((x) => x.assessment_date === viewDate);
+                  if (!h) return null;
+                  return (
+                    <div className="space-y-6 pt-2">
+                      {Object.entries(grouped).map(([cat, qs]) => {
+                        const answeredQs = qs.filter((q) => typeof h.answers?.[q.id] === 'number');
+                        if (answeredQs.length === 0) return null;
+                        return (
+                          <div key={cat} className="space-y-2">
+                            <h3 className="font-poppins font-semibold text-sm flex items-center gap-2">
+                              <span>{qs[0].icon}</span> {cat}
+                            </h3>
+                            <ul className="space-y-1">
+                              {answeredQs.map((q) => (
+                                <li key={q.id} className="flex items-center justify-between gap-4 text-sm">
+                                  <span className="text-muted-foreground">{q.id}. {q.text}</span>
+                                  <span
+                                    className="shrink-0 font-bold rounded-full w-7 h-7 flex items-center justify-center text-white"
+                                    style={{ backgroundColor: CATEGORY_COLORS[cat] }}
+                                  >
+                                    {h.answers[q.id]}
+                                  </span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        );
+                      })}
+                      {(h.medication_morning || h.medication_afternoon || h.medication_night) && (
+                        <div className="space-y-1 text-sm">
+                          <h3 className="font-poppins font-semibold">💊 Medicación</h3>
+                          {h.medication_morning && <p><span className="text-muted-foreground">Mañana:</span> {h.medication_morning}</p>}
+                          {h.medication_afternoon && <p><span className="text-muted-foreground">Tarde:</span> {h.medication_afternoon}</p>}
+                          {h.medication_night && <p><span className="text-muted-foreground">Noche:</span> {h.medication_night}</p>}
+                        </div>
+                      )}
+                      {h.notes && (
+                        <div className="space-y-1 text-sm">
+                          <h3 className="font-poppins font-semibold">📝 Notas</h3>
+                          <p className="text-muted-foreground whitespace-pre-wrap">{h.notes}</p>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           <TabsContent value="ai" className="space-y-6">
             <Card className="border-0 shadow-lg">
               <CardHeader>
