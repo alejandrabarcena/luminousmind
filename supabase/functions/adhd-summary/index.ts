@@ -29,29 +29,35 @@ Devuelve un objeto JSON con:
 Sé específico: nada de frases genéricas; cada pregunta debe referirse a patrones reales de los datos.
 Responde SOLO con el objeto JSON válido, sin Markdown, sin bloques de código, sin texto antes ni después.`;
 
-const summarySchema = jsonSchema({
-  type: "object",
-  additionalProperties: false,
-  required: ["resumen", "patrones", "preguntas", "recordatorio"],
-  properties: {
-    resumen: { type: "string" },
-    patrones: { type: "array", items: { type: "string" } },
-    preguntas: {
-      type: "array",
-      items: {
-        type: "object",
-        additionalProperties: false,
-        required: ["pregunta", "contexto", "respuesta_sugerida"],
-        properties: {
-          pregunta: { type: "string" },
-          contexto: { type: "string" },
-          respuesta_sugerida: { type: "string" },
-        },
-      },
-    },
-    recordatorio: { type: "string" },
-  },
-});
+const parseSummary = (text: string) => {
+  const cleaned = text.trim().replace(/^```(?:json)?/i, "").replace(/```$/, "").trim();
+  const start = cleaned.indexOf("{");
+  const end = cleaned.lastIndexOf("}");
+  if (start === -1 || end === -1) return null;
+  try {
+    const o = JSON.parse(cleaned.slice(start, end + 1));
+    if (
+      typeof o?.resumen === "string" &&
+      Array.isArray(o?.patrones) &&
+      Array.isArray(o?.preguntas) &&
+      typeof o?.recordatorio === "string"
+    ) {
+      return {
+        resumen: o.resumen,
+        patrones: o.patrones.map(String),
+        preguntas: o.preguntas
+          .filter((q: any) => q && typeof q.pregunta === "string")
+          .map((q: any) => ({
+            pregunta: String(q.pregunta),
+            contexto: String(q.contexto ?? ""),
+            respuesta_sugerida: String(q.respuesta_sugerida ?? ""),
+          })),
+        recordatorio: o.recordatorio,
+      };
+    }
+  } catch { /* fall through */ }
+  return null;
+};
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -105,7 +111,6 @@ Deno.serve(async (req) => {
       system: SYSTEM,
       prompt,
       abortSignal: req.signal,
-      experimental_output: Output.object({ schema: summarySchema }),
       onError: ({ error }) => {
         streamError = error;
       },
@@ -119,9 +124,10 @@ Deno.serve(async (req) => {
         },
       },
     });
-    const output = await result.experimental_output;
+    const text = await result.text;
     if (streamError) throw streamError;
-    if (!output || !output.resumen) return json({ error: "No se pudo generar el resumen" }, 502);
+    const output = parseSummary(text);
+    if (!output) return json({ error: "No se pudo generar el resumen" }, 502);
     const runId = runIdFetch.getRunId();
     return new Response(JSON.stringify({ summary: output }), {
       headers: {
