@@ -1,5 +1,5 @@
 import { createOpenAI } from "npm:@ai-sdk/openai";
-import { streamText, Output, jsonSchema } from "npm:ai";
+import { streamText } from "npm:ai";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { createLovableAiGatewayRunIdFetch, getLovableAiGatewayRunId } from "../_shared/run-id.ts";
 
@@ -26,7 +26,8 @@ Devuelve un objeto JSON con:
   - contexto: 1 frase explicando por qué conviene plantearla, basada en las respuestas.
   - respuesta_sugerida: cómo podría la persona describir su situación al profesional (2-3 frases en primera persona, redactadas a partir de SUS respuestas reales, con valores concretos cuando ayuden).
 - recordatorio: una frase aclarando que esto no es un diagnóstico y que ante malestar intenso busque ayuda profesional.
-Sé específico: nada de frases genéricas; cada pregunta debe referirse a patrones reales de los datos.`;
+Sé específico: nada de frases genéricas; cada pregunta debe referirse a patrones reales de los datos.
+Responde SOLO con el objeto JSON válido, sin Markdown, sin bloques de código, sin texto antes ni después.`;
 
 const summarySchema = jsonSchema({
   type: "object",
