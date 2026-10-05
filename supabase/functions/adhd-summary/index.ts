@@ -18,16 +18,46 @@ const json = (body: unknown, status = 200) =>
 
 const SYSTEM = `Eres un asistente de bienestar en español. Recibes respuestas de un autoregistro diario sobre atención, organización, energía, emociones, sueño, medicación y autopercepción (escala 1 a 5, donde 1 = nada/muy poco y 5 = mucho).
 NO diagnosticas, NO recomiendas cambiar medicación ni dosis, y NO sustituyes a un profesional. Usa un tono cálido y respetuoso.
-Responde en Markdown con exactamente estas secciones:
-## Resumen orientativo
-(3-5 frases sobre lo observado hoy)
-## Patrones que destacan
-(3-6 viñetas; si hay historial, menciona tendencias)
-## Preguntas para conversar con tu profesional
-(5-7 preguntas concretas en primera persona)
-## Recordatorio
-(una frase: esto no es un diagnóstico; ante malestar intenso busca ayuda profesional)
-Máximo 400 palabras.`;
+Devuelve un objeto JSON con:
+- resumen: 3-5 frases sobre lo observado hoy.
+- patrones: 3-6 viñetas; si hay historial, menciona tendencias concretas.
+- preguntas: 5-7 elementos para conversar con un profesional. Cada uno con:
+  - pregunta: pregunta concreta en primera persona.
+  - contexto: 1 frase explicando por qué conviene plantearla, basada en las respuestas.
+  - respuesta_sugerida: cómo podría la persona describir su situación al profesional (2-3 frases en primera persona, redactadas a partir de SUS respuestas reales, con valores concretos cuando ayuden).
+- recordatorio: una frase aclarando que esto no es un diagnóstico y que ante malestar intenso busque ayuda profesional.
+Sé específico: nada de frases genéricas; cada pregunta debe referirse a patrones reales de los datos.
+Responde SOLO con el objeto JSON válido, sin Markdown, sin bloques de código, sin texto antes ni después.`;
+
+const parseSummary = (text: string) => {
+  const cleaned = text.trim().replace(/^```(?:json)?/i, "").replace(/```$/, "").trim();
+  const start = cleaned.indexOf("{");
+  const end = cleaned.lastIndexOf("}");
+  if (start === -1 || end === -1) return null;
+  try {
+    const o = JSON.parse(cleaned.slice(start, end + 1));
+    if (
+      typeof o?.resumen === "string" &&
+      Array.isArray(o?.patrones) &&
+      Array.isArray(o?.preguntas) &&
+      typeof o?.recordatorio === "string"
+    ) {
+      return {
+        resumen: o.resumen,
+        patrones: o.patrones.map(String),
+        preguntas: o.preguntas
+          .filter((q: any) => q && typeof q.pregunta === "string")
+          .map((q: any) => ({
+            pregunta: String(q.pregunta),
+            contexto: String(q.contexto ?? ""),
+            respuesta_sugerida: String(q.respuesta_sugerida ?? ""),
+          })),
+        recordatorio: o.recordatorio,
+      };
+    }
+  } catch { /* fall through */ }
+  return null;
+};
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -96,9 +126,10 @@ Deno.serve(async (req) => {
     });
     const text = await result.text;
     if (streamError) throw streamError;
-    if (!text.trim()) return json({ error: "No se pudo generar el resumen" }, 502);
+    const output = parseSummary(text);
+    if (!output) return json({ error: "No se pudo generar el resumen" }, 502);
     const runId = runIdFetch.getRunId();
-    return new Response(JSON.stringify({ summary: text }), {
+    return new Response(JSON.stringify({ summary: output }), {
       headers: {
         ...corsHeaders,
         "Content-Type": "application/json",
